@@ -1,0 +1,91 @@
+name: avalonia-xaml-playground
+base: core24
+adopt-info: xaml-playground
+icon: snap/gui/avalonia-xaml-playground.png
+summary: Avalonia XAML and C# playground
+description: |
+  The Avalonia XAML Playground application allows you to write
+  XAML and code-behind pieces of code, with Avalonia controls,
+  and seeing the results in real time.
+
+grade: stable
+confinement: strict
+
+parts:
+  prereqs:
+    plugin: nil
+    after:
+      - xaml-playground
+    stage-packages:
+      - dotnet-runtime-8.0
+      - fontconfig
+      - libfontconfig1
+      - libice6
+      - libsm6
+      - libx11-6
+
+  patches:
+    plugin: dump
+    source: snap/patches
+    prime:
+      - -*
+
+  xaml-playground:
+    plugin: nil
+    source: https://github.com/AvaloniaUI/XamlPlayground
+    source-type: git
+    after:
+      - patches
+
+    build-packages:
+      - dotnet-sdk-8.0
+      - git
+
+    override-build: |
+      craftctl default
+
+      version=$(git show -s --format=%h)
+      craftctl set version="${version}"
+
+      dotnet --info
+      mkdir -p $CRAFT_PART_INSTALL/opt
+
+      git apply $CRAFT_STAGE/*.patch
+      dotnet publish src/XamlPlayground.NetCore/XamlPlayground.NetCore.csproj \
+        --configuration Release --output $CRAFT_PART_INSTALL/opt/xamlplayground
+
+      if [ "${CRAFT_ARCH_BUILD_FOR}" = "amd64" ]; then
+        rm -rf $CRAFT_PART_INSTALL/opt/xamlplayground/runtimes/linux-arm*
+      elif [ "${CRAFT_ARCH_BUILD_FOR}" = "arm64" ]; then
+        rm -rf $CRAFT_PART_INSTALL/opt/xamlplayground/runtimes/linux-x64*
+      else
+        echo "Unknown architecture (${CRAFT_ARCH_BUILD_FOR})"
+        exit 1
+      fi
+
+      rm -rf $CRAFT_PART_INSTALL/opt/xamlplayground/runtimes/osx
+      rm -rf $CRAFT_PART_INSTALL/opt/xamlplayground/runtimes/win-*
+      rm -rf $CRAFT_PART_INSTALL/opt/xamlplayground/runtimes/linux-musl-*
+
+apps:
+  avalonia-xaml-playground:
+    command: usr/lib/dotnet/dotnet $SNAP/opt/xamlplayground/XamlPlayground.NetCore.dll
+    desktop: meta/gui/avalonia-xaml-playground.desktop
+    plugs:
+      - desktop
+      - desktop-legacy
+      - home
+      - unity7
+      - wayland
+
+lint:
+  ignore:
+    - library:
+      - usr/lib/**/libICE*
+      - usr/lib/**/libicu*
+      - usr/lib/**/liblttng-ust-*
+      - usr/lib/**/libSM*
+      - usr/lib/**/libX11*
+      - usr/lib/**/libXau*
+      - usr/lib/**/libxcb*
+      - usr/lib/**/libXdmcp*
