@@ -24,18 +24,10 @@ parts:
       - libsm6
       - libx11-6
 
-  patches:
-    plugin: dump
-    source: snap/patches
-    prime:
-      - -*
-
   xaml-playground:
     plugin: nil
     source: https://github.com/AvaloniaUI/XamlPlayground
     source-type: git
-    after:
-      - patches
 
     build-packages:
       - dotnet-sdk-8.0
@@ -50,9 +42,14 @@ parts:
       dotnet --info
       mkdir -p $CRAFT_PART_INSTALL/opt
 
-      git apply $CRAFT_STAGE/*.patch
       dotnet publish src/XamlPlayground.NetCore/XamlPlayground.NetCore.csproj \
-        --configuration Release --output $CRAFT_PART_INSTALL/opt/xamlplayground
+        --configuration Release --output $CRAFT_PART_INSTALL/opt/xamlplayground \
+        -- \
+        /p:AvaloniaVersion=11.1.3 \
+        /p:AvaloniaBehaviorsVersion=11.1.0.4 \
+        /p:AvaloniaEditVersion=11.1.0 \
+        /p:OctokitVersion=13.0.1 \
+        /p:CommunityToolkitMvvmVersion=8.3.2
 
       if [ "${CRAFT_ARCH_BUILD_FOR}" = "amd64" ]; then
         rm -rf $CRAFT_PART_INSTALL/opt/xamlplayground/runtimes/linux-arm*
