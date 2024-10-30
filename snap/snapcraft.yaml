@@ -11,18 +11,36 @@ description: |
 grade: stable
 confinement: strict
 
+plugs:
+  dotnet-runtime:
+    interface: content
+    default-provider: dotnet-runtime-80
+    content: dotnet-runtime-80
+    target: $SNAP/usr/lib
+
 parts:
   prereqs:
     plugin: nil
     after:
       - xaml-playground
     stage-packages:
-      - dotnet-runtime-8.0
       - fontconfig
       - libfontconfig1
       - libice6
+      - libicu74
       - libsm6
       - libx11-6
+
+  launcher:
+    plugin: dump
+    source: snap
+    organize:
+      'launcher.sh' : usr/bin/launcher.sh
+    stage:
+      - usr/bin/launcher.sh
+    override-prime: |
+      craftctl default
+      chmod a+x usr/bin/launcher.sh
 
   xaml-playground:
     plugin: nil
@@ -66,12 +84,14 @@ parts:
 
 apps:
   avalonia-xaml-playground:
-    command: usr/lib/dotnet/dotnet $SNAP/opt/xamlplayground/XamlPlayground.NetCore.dll
+    command: usr/bin/launcher.sh
     desktop: meta/gui/avalonia-xaml-playground.desktop
     plugs:
       - desktop
       - desktop-legacy
+      - dotnet-runtime
       - home
+      - opengl
       - unity7
       - wayland
 
