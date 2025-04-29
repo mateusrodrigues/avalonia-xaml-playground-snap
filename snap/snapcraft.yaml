@@ -59,6 +59,8 @@ parts:
       version=$(git show -s --format=%h)
       craftctl set version="${version}"
       craftctl default
+    organize:
+      '*': opt/xamlplayground/
 
   launcher:
     plugin: dump
