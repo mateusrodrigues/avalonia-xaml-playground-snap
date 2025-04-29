@@ -39,6 +39,29 @@ parts:
       - libsm6
       - libx11-6
 
+  xaml-playground:
+    plugin: dotnet
+    source: https://github.com/AvaloniaUI/XamlPlayground
+    source-type: git
+    build-packages:
+      - git
+    dotnet-version: "8.0"
+    dotnet-configuration: "Release"
+    dotnet-project: src/XamlPlayground.NetCore/XamlPlayground.NetCore.csproj
+    dotnet-verbosity: "minimal"
+    dotnet-properties:
+      AvaloniaVersion: 11.2.5
+      AvaloniaBehaviorsVersion: 11.2.0.13
+      AvaloniaEditVersion: 11.1.0
+      OctokitVersion: 14.0.0
+      CommunityToolkitMvvmVersion: 8.4.0
+    override-build: |
+      version=$(git show -s --format=%h)
+      craftctl set version="${version}"
+      craftctl default
+    organize:
+      '*': opt/xamlplayground/
+
   launcher:
     plugin: dump
     source: snap
@@ -49,46 +72,6 @@ parts:
     override-prime: |
       craftctl default
       chmod a+x usr/bin/launcher.sh
-
-  xaml-playground:
-    plugin: nil
-    source: https://github.com/AvaloniaUI/XamlPlayground
-    source-type: git
-
-    build-packages:
-      - dotnet-sdk-8.0
-      - git
-
-    override-build: |
-      craftctl default
-
-      version=$(git show -s --format=%h)
-      craftctl set version="${version}"
-
-      dotnet --info
-      mkdir -p $CRAFT_PART_INSTALL/opt
-
-      dotnet publish src/XamlPlayground.NetCore/XamlPlayground.NetCore.csproj \
-        --configuration Release --output $CRAFT_PART_INSTALL/opt/xamlplayground \
-        -- \
-        /p:AvaloniaVersion=11.2.5 \
-        /p:AvaloniaBehaviorsVersion=11.2.0.13 \
-        /p:AvaloniaEditVersion=11.1.0 \
-        /p:OctokitVersion=14.0.0 \
-        /p:CommunityToolkitMvvmVersion=8.4.0
-
-      if [ "${CRAFT_ARCH_BUILD_FOR}" = "amd64" ]; then
-        rm -rf $CRAFT_PART_INSTALL/opt/xamlplayground/runtimes/linux-arm*
-      elif [ "${CRAFT_ARCH_BUILD_FOR}" = "arm64" ]; then
-        rm -rf $CRAFT_PART_INSTALL/opt/xamlplayground/runtimes/linux-x64*
-      else
-        echo "Unknown architecture (${CRAFT_ARCH_BUILD_FOR})"
-        exit 1
-      fi
-
-      rm -rf $CRAFT_PART_INSTALL/opt/xamlplayground/runtimes/osx
-      rm -rf $CRAFT_PART_INSTALL/opt/xamlplayground/runtimes/win-*
-      rm -rf $CRAFT_PART_INSTALL/opt/xamlplayground/runtimes/linux-musl-*
 
 apps:
   avalonia-xaml-playground:
