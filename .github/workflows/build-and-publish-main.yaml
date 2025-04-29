@@ -20,6 +20,8 @@ jobs:
       run: echo "GIT_SHA=$(git show -s --format=%h)" > "$GITHUB_OUTPUT"
     - uses: snapcore/action-build@v1
       id: build
+      with:
+        snapcraft-channel: latest/edge/dotnet
     - uses: actions/upload-artifact@v4
       id: upload-artifact
       with:
