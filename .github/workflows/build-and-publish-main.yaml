@@ -22,7 +22,6 @@ jobs:
     - uses: snapcore/action-build@v1
       id: build
       with:
-        snapcraft-channel: latest/edge/dotnet
         snapcraft-args: --verbose
     - uses: actions/upload-artifact@v4
       id: upload-artifact
