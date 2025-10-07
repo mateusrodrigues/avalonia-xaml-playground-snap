@@ -21,7 +21,10 @@ jobs:
       id: checkout
     - uses: snapcore/action-build@v1
       id: build
+      env:
+        SNAPCRAFT_ENABLE_EXPERIMENTAL_EXTENSIONS: "1"
       with:
+        snapcraft-channel: latest/edge
         snapcraft-args: --verbose
     - uses: actions/upload-artifact@v4
       id: upload-artifact
