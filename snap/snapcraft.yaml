@@ -37,16 +37,10 @@ parts:
     source-type: git
     build-packages:
       - git
-    dotnet-version: "8.0"
+    dotnet-version: "10.0"
     dotnet-configuration: "Release"
     dotnet-project: src/XamlPlayground.NetCore/XamlPlayground.NetCore.csproj
     dotnet-verbosity: "minimal"
-    dotnet-properties:
-      AvaloniaVersion: 11.2.5
-      AvaloniaBehaviorsVersion: 11.2.0.13
-      AvaloniaEditVersion: 11.1.0
-      OctokitVersion: 14.0.0
-      CommunityToolkitMvvmVersion: 8.4.0
     override-build: |
       version=$(git show -s --format=%h)
       craftctl set version="${version}"
@@ -58,7 +52,7 @@ apps:
   avalonia-xaml-playground:
     command: opt/xamlplayground/XamlPlayground.NetCore
     desktop: meta/gui/avalonia-xaml-playground.desktop
-    extensions: [ dotnet8 ]
+    extensions: [ dotnet10 ]
     plugs:
       - desktop
       - desktop-legacy
