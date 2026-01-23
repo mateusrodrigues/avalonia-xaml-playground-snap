@@ -1,6 +1,6 @@
 
 [Desktop Entry]
-Name=XAML Playground
+Name=Avalonia Play
 Type=Application
 Exec=avalonia-xaml-playground
 Icon=${SNAP}/meta/gui/avalonia-xaml-playground.png
